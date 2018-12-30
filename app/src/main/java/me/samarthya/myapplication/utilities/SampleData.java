@@ -26,11 +26,16 @@ public class SampleData {
         return cal.getTime();
     }
 
+    /**
+     * Sample dummy data.
+     *
+     * @return
+     */
     public static List<NoteEntity> getNotes() {
         List<NoteEntity> noteEntityList = new ArrayList<>();
-        noteEntityList.add(new NoteEntity(1, getDate(0), SAMPLE_STRING_1));
-        noteEntityList.add(new NoteEntity(2, getDate(-1), SAMPLE_STRING_2));
-        noteEntityList.add(new NoteEntity(3, getDate(-3), SAMPLE_STRING_3));
+        noteEntityList.add(new NoteEntity(getDate(0), SAMPLE_STRING_1));
+        noteEntityList.add(new NoteEntity(getDate(-1), SAMPLE_STRING_2));
+        noteEntityList.add(new NoteEntity(getDate(-3), SAMPLE_STRING_3));
         return noteEntityList;
     }
 }

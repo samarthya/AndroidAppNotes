@@ -1,8 +1,10 @@
 package me.samarthya.myapplication;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,7 +12,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.samarthya.myapplication.database.NoteEntity;
 import me.samarthya.myapplication.ui.NotesAdapter;
-import me.samarthya.myapplication.utilities.SampleData;
 import me.samarthya.myapplication.viewmodel.MainViewModel;
 
 public class MainActivity extends AppCompatActivity {
@@ -46,19 +46,30 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         ButterKnife.bind(this);
-        initViewModel();
         initRecyclerView();
-
-        noteEntityList.addAll(SampleData.getNotes());
-
-        for (NoteEntity noteEntity: noteEntityList
-             ) {
-            Log.i("MyNotes", noteEntity.toString());
-        }
+        initViewModel();
     }
 
     private void initViewModel() {
+
+        final Observer<List<NoteEntity>> notesObserver = new Observer<List<NoteEntity>>() {
+            @Override
+            public void onChanged(@Nullable List<NoteEntity> noteEntities) {
+                noteEntityList.clear();
+                noteEntityList.addAll(noteEntities);
+
+                if (mAdapter == null) {
+                    mAdapter = new NotesAdapter(noteEntityList, MainActivity.this);
+                    mRecyclerView.setAdapter(mAdapter);
+                } else {
+                    mAdapter.notifyDataSetChanged();
+                }
+
+            }
+        };
+
         mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        mViewModel.mNotes.observe(this, notesObserver);
     }
 
     /**
@@ -66,12 +77,11 @@ public class MainActivity extends AppCompatActivity {
      */
     private void initRecyclerView() {
         mRecyclerView.setHasFixedSize(true);
-        mAdapter = new NotesAdapter(noteEntityList, this);
+
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
-        mRecyclerView.setAdapter(mAdapter);
     }
 
     @Override
@@ -89,10 +99,16 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_add_sample_data) {
+            addSampleData();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void addSampleData() {
+        Log.i("MyNotes", "addSampleData: Add sample data.");
+        mViewModel.addSampleData();
     }
 }
