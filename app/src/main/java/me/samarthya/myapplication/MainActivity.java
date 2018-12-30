@@ -1,5 +1,6 @@
 package me.samarthya.myapplication;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,7 @@ import butterknife.OnClick;
 import me.samarthya.myapplication.database.NoteEntity;
 import me.samarthya.myapplication.ui.NotesAdapter;
 import me.samarthya.myapplication.utilities.SampleData;
+import me.samarthya.myapplication.viewmodel.MainViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,7 +36,8 @@ public class MainActivity extends AppCompatActivity {
 
     private List<NoteEntity> noteEntityList = new ArrayList<>();
     private NotesAdapter mAdapter;
-
+    private MainViewModel mViewModel;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         ButterKnife.bind(this);
+        initViewModel();
         initRecyclerView();
 
         noteEntityList.addAll(SampleData.getNotes());
@@ -50,6 +55,10 @@ public class MainActivity extends AppCompatActivity {
              ) {
             Log.i("MyNotes", noteEntity.toString());
         }
+    }
+
+    private void initViewModel() {
+        mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
     }
 
     /**
