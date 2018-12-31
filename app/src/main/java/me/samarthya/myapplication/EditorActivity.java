@@ -25,6 +25,7 @@ public class EditorActivity extends AppCompatActivity {
 
     @BindView(R.id.note_text)
     TextView mTextView;
+
     private EditorViewModel mViewModel;
     private boolean mNewNote, mEditing;
 

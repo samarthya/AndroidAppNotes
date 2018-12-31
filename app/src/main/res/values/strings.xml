@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Plain Old Notes</string>
+    <string name="app_name">My Diary</string>
     <string name="action_add_sample_data">Add sample data</string>
     <string name="title_activity_editor">EditorActivity</string>
     <string name="large_text">

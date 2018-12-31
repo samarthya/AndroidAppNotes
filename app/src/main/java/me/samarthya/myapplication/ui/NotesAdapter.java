@@ -16,6 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.samarthya.myapplication.EditorActivity;
 import me.samarthya.myapplication.R;
+import me.samarthya.myapplication.database.DateConverter;
 import me.samarthya.myapplication.database.NoteEntity;
 
 import static me.samarthya.myapplication.utilities.Constants.NOTE_ID_KEY;
@@ -42,6 +43,7 @@ public class NotesAdapter extends RecyclerView.Adapter< NotesAdapter.ViewHolder 
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         final NoteEntity note = mNoteList.get(position);
         viewHolder.mTextView.setText(note.getText());
+        viewHolder.mTextStamp.setText(DateConverter.formatDate(note.getDate()));
 
         viewHolder.mFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,6 +63,9 @@ public class NotesAdapter extends RecyclerView.Adapter< NotesAdapter.ViewHolder 
     public class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.note_text)
         TextView mTextView;
+
+        @BindView(R.id.note_stamp)
+        TextView mTextStamp;
 
         @BindView(R.id.fab)
         FloatingActionButton mFab;
