@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -37,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private List<NoteEntity> noteEntityList = new ArrayList<>();
     private NotesAdapter mAdapter;
     private MainViewModel mViewModel;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
         initViewModel();
     }
 
+    /**
+     * Initalizes the view model.
+     */
     private void initViewModel() {
 
         final Observer<List<NoteEntity>> notesObserver = new Observer<List<NoteEntity>>() {
@@ -82,6 +86,11 @@ public class MainActivity extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
+        DividerItemDecoration divider = new DividerItemDecoration(
+                mRecyclerView.getContext(), linearLayoutManager.getOrientation()
+        );
+        mRecyclerView.addItemDecoration(divider);
+
     }
 
     @Override
@@ -100,15 +109,27 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_add_sample_data) {
+            Log.i("MyNotes", "onOptionsItemSelected: Add sample data selected.");
             addSampleData();
             return true;
+        } else if (id == R.id.action_delete_all) {
+            deleteAllNotes();
+            return true;
+
         }
+
 
         return super.onOptionsItemSelected(item);
     }
 
+    private void deleteAllNotes() {
+        Log.i("MyNotes", "deleteAllNotes: Delete all notes called.");
+        mViewModel.deleteAllNotes();
+    }
+
     private void addSampleData() {
         Log.i("MyNotes", "addSampleData: Add sample data.");
+
         mViewModel.addSampleData();
     }
 }

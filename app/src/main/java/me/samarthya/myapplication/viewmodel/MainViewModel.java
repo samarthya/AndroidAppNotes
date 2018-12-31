@@ -15,6 +15,9 @@ import me.samarthya.myapplication.database.NoteEntity;
  */
 public class MainViewModel extends AndroidViewModel {
 
+    /**
+     * LiveData is immutable.
+     */
     public LiveData<List<NoteEntity>> mNotes;
     private AppRepository mRepository;
 
@@ -26,5 +29,9 @@ public class MainViewModel extends AndroidViewModel {
 
     public void addSampleData() {
         mRepository.addSampleData();
+    }
+
+    public void deleteAllNotes() {
+        mRepository.deleteAllNotes();
     }
 }
