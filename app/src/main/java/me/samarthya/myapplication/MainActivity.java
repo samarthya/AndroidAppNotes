@@ -24,6 +24,9 @@ import me.samarthya.myapplication.database.NoteEntity;
 import me.samarthya.myapplication.ui.NotesAdapter;
 import me.samarthya.myapplication.viewmodel.MainViewModel;
 
+/**
+ * Main activity class
+ */
 public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.recycler_view)

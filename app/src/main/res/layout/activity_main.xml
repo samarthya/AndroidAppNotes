@@ -17,6 +17,8 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:logo="@drawable/app_icon"
+            app:buttonGravity="top"
+            app:logoDescription="@string/app_logo_description"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     </android.support.design.widget.AppBarLayout>

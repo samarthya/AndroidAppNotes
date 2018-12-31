@@ -96,4 +96,6 @@
     <string name="new_note">New Note</string>
     <string name="edit_note">Edit Note</string>
     <string name="action_delete">Delete</string>
+    <string name="app_logo_description">My personal diary</string>
+    <string name="action_attach">Attach</string>
 </resources>

@@ -44,6 +44,7 @@ public class EditorActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             mEditing = savedInstanceState.getBoolean(EDITING_KEY);
         }
+
         initViewModel();
     }
 
@@ -79,18 +80,29 @@ public class EditorActivity extends AppCompatActivity {
         if (!mNewNote) {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.menu_editor, menu);
+        } else {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.menu_attach, menu);
         }
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            saveAndReturn();
-            return true;
-        } else if (item.getItemId() == R.id.action_delete) {
-            mViewModel.deleteNote();
-            finish();
+        switch (item.getItemId()) {
+            case android.R.id.home: {
+                saveAndReturn();
+                return true;
+            }
+
+            case R.id.action_delete: {
+                mViewModel.deleteNote();
+                finish();
+            }
+
+            case R.id.action_attach_picture: {
+                finish();
+            }
         }
         return super.onOptionsItemSelected(item);
     }
