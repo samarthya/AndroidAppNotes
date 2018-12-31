@@ -43,9 +43,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         ButterKnife.bind(this);
         initRecyclerView();
         initViewModel();
@@ -60,6 +59,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable List<NoteEntity> noteEntities) {
                 noteEntityList.clear();
+                if (noteEntities != null && noteEntities.size() == 0) {
+                    addSampleData();
+                }
                 noteEntityList.addAll(noteEntities);
 
                 if (mAdapter == null) {
@@ -89,8 +91,26 @@ public class MainActivity extends AppCompatActivity {
         DividerItemDecoration divider = new DividerItemDecoration(
                 mRecyclerView.getContext(), linearLayoutManager.getOrientation()
         );
+
         mRecyclerView.addItemDecoration(divider);
 
+    }
+
+    /**
+     * Deletes all notes.
+     */
+    private void deleteAllNotes() {
+        Log.i("MyNotes", "deleteAllNotes: Delete all notes called.");
+        mViewModel.deleteAllNotes();
+    }
+
+    /**
+     * Adds sample data.
+     */
+    private void addSampleData() {
+        Log.i("MyNotes", "addSampleData: Add sample data.");
+
+        mViewModel.addSampleData();
     }
 
     @Override
@@ -107,29 +127,15 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_add_sample_data) {
-            Log.i("MyNotes", "onOptionsItemSelected: Add sample data selected.");
-            addSampleData();
-            return true;
-        } else if (id == R.id.action_delete_all) {
-            deleteAllNotes();
-            return true;
-
+        switch (id) {
+            case R.id.action_delete_all: {
+                deleteAllNotes();
+                return true;
+            }
         }
-
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void deleteAllNotes() {
-        Log.i("MyNotes", "deleteAllNotes: Delete all notes called.");
-        mViewModel.deleteAllNotes();
-    }
 
-    private void addSampleData() {
-        Log.i("MyNotes", "addSampleData: Add sample data.");
-
-        mViewModel.addSampleData();
-    }
 }
