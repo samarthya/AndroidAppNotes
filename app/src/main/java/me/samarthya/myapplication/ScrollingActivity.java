@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -27,15 +29,21 @@ import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import me.samarthya.myapplication.database.NoteEntity;
-import me.samarthya.myapplication.viewmodel.EditorViewModel;
+import me.samarthya.myapplication.viewmodel.ScrollingViewModel;
 
 import static me.samarthya.myapplication.utilities.Constants.CAPTURE_PHOTO;
 import static me.samarthya.myapplication.utilities.Constants.EDITING_KEY;
 import static me.samarthya.myapplication.utilities.Constants.NOTE_ID_KEY;
 import static me.samarthya.myapplication.utilities.Constants.TAG_EDITOR_ACTIVITY;
+import static me.samarthya.myapplication.utilities.Constants.TAG_SVM;
 
-public class EditorActivity extends AppCompatActivity {
+/**
+ * Just a copy of EditorActivity that I am trying to play around with.
+ */
+public class ScrollingActivity extends AppCompatActivity {
+
 
     @BindView(R.id.note_text)
     TextView mTextView;
@@ -43,9 +51,88 @@ public class EditorActivity extends AppCompatActivity {
     @BindView(R.id.image_attached)
     ImageView mImageView;
 
-    String mCurrentPhotoPath;
-    private EditorViewModel mViewModel;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
+    @BindView(R.id.add_image)
+    FloatingActionButton mAddImageButton;
+
+    @BindView(R.id.delete_image)
+    FloatingActionButton mDeleteImageButton;
+    ScrollingViewModel mViewModel;
+    private String mCurrentPhotoPath;
     private boolean mNewNote, mEditing;
+
+
+    @OnClick(R.id.add_image)
+    void addOrEditImageClicked() {
+        delegateToCaptureImage();
+        setImageInformation();
+    }
+
+    /**
+     * The image delete path.
+     */
+    void deleteAttachedImage() {
+        /**
+         * Delete the existing file if any and then clear out
+         * the holders.
+         */
+        if (mCurrentPhotoPath != null) {
+            File mFile = new File(mCurrentPhotoPath);
+            if (mFile.exists()) {
+                Boolean bDeleted = mFile.delete();
+            }
+            mCurrentPhotoPath = null;
+        }
+
+        setImageInformation();
+    }
+
+    /**
+     * Sets the image in the Image view either loaded from Camera
+     * or from the URL.
+     */
+    private void setPic() {
+        // Get the dimensions of the View
+        int targetW = mImageView.getWidth();
+        int targetH = mImageView.getHeight();
+
+        // Get the dimensions of the bitmap
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
+
+        // Determine how much to scale down the image
+        int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
+
+        // Decode the image file into a Bitmap sized to fill the View
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+
+        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        Log.i(TAG_EDITOR_ACTIVITY, "setPic: File at " + mCurrentPhotoPath + " is set.");
+        mImageView.setImageBitmap(bitmap);
+    }
+
+    /**
+     * Change the edit information.
+     */
+    private void setImageInformation() {
+        if (mCurrentPhotoPath != null) {
+            mAddImageButton.setImageResource(R.drawable.ic_edit);
+            mImageView.setImageResource(R.drawable.image_holder);
+            mDeleteImageButton.setClickable(true);
+        } else {
+
+            mAddImageButton.setImageResource(R.drawable.ic_add);
+            mDeleteImageButton.setClickable(false);
+        }
+    }
 
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -64,46 +151,45 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        Log.i(TAG_EDITOR_ACTIVITY, "onStart: launched");
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_editor);
+        setContentView(R.layout.activity_scrolling);
+        ButterKnife.bind(this);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_check);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        ButterKnife.bind(this);
-
-        if (savedInstanceState != null) {
-            mEditing = savedInstanceState.getBoolean(EDITING_KEY);
-        }
-
         initViewModel();
+
+        mDeleteImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteAttachedImage();
+            }
+        });
     }
 
-    private void galleryAddPic() {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-
-        if (mCurrentPhotoPath != null) {
-            File f = new File(mCurrentPhotoPath);
-            Uri contentUri = Uri.fromFile(f);
-            mediaScanIntent.setData(contentUri);
-            this.sendBroadcast(mediaScanIntent);
-        }
-    }
-
-    /**
-     * INitializes the view model.
-     */
     private void initViewModel() {
-        mViewModel = ViewModelProviders.of(this).get(EditorViewModel.class);
+        mViewModel = ViewModelProviders.of(this).get(ScrollingViewModel.class);
 
         mViewModel.mLiveNote.observe(this, new Observer<NoteEntity>() {
             @Override
             public void onChanged(@Nullable NoteEntity noteEntity) {
                 if (noteEntity != null && !mEditing) {
                     mTextView.setText(noteEntity.getText());
+                    if (noteEntity.isAttachment()) {
+                        mCurrentPhotoPath = noteEntity.getImgUrl();
+                        Log.i(TAG_EDITOR_ACTIVITY, "onChanged: URL = " + mCurrentPhotoPath);
+                        setImageInformation();
+                        setPic();
+                    }
                 }
 
             }
@@ -126,7 +212,7 @@ public class EditorActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         if (!mNewNote) {
             MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.menu_editor, menu);
+            inflater.inflate(R.menu.menu_scrolling, menu);
         } else {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.menu_attach, menu);
@@ -145,15 +231,34 @@ public class EditorActivity extends AppCompatActivity {
             case R.id.action_delete: {
                 mViewModel.deleteNote();
                 finish();
+                return true;
             }
 
             case R.id.action_attach_picture: {
                 delegateToCaptureImage();
+                return true;
             }
         }
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        saveAndReturn();
+    }
+
+    /**
+     * Saves the Note and returns.
+     */
+    private void saveAndReturn() {
+        Log.i(TAG_SVM, "saveAndReturn: " + mCurrentPhotoPath);
+        mViewModel.saveNote(mTextView.getText().toString(), mCurrentPhotoPath);
+        finish(); // Close the current activity and return to list
+    }
+
+    /**
+     * Attach image.
+     */
     void attachImage() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -169,7 +274,6 @@ public class EditorActivity extends AppCompatActivity {
                             photoFile);
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                     startActivityForResult(takePictureIntent, CAPTURE_PHOTO);
-                    galleryAddPic();
                 }
             } catch (IOException ex) {
                 // Error occurred while creating the File
@@ -183,18 +287,8 @@ public class EditorActivity extends AppCompatActivity {
      * and then save it as part of the note.
      */
     private void delegateToCaptureImage() {
-        Log.i(TAG_EDITOR_ACTIVITY, "delegateToCaptureImage: Clicked");
+        Log.i(TAG_EDITOR_ACTIVITY, "delegateToCaptureImage: called.");
         attachImage();
-    }
-
-    @Override
-    public void onBackPressed() {
-        saveAndReturn();
-    }
-
-    private void saveAndReturn() {
-        mViewModel.saveNote(mTextView.getText().toString());
-        finish(); // Close the current activity and reutrn to list
     }
 
     @Override
@@ -207,33 +301,9 @@ public class EditorActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == CAPTURE_PHOTO && resultCode == RESULT_OK) {
             Log.i(TAG_EDITOR_ACTIVITY, "onActivityResult: @ " + mCurrentPhotoPath);
-            galleryAddPic();
+            //galleryAddPic();
             setPic();
         }
-    }
-
-    private void setPic() {
-        // Get the dimensions of the View
-        int targetW = mImageView.getWidth();
-        int targetH = mImageView.getHeight();
-
-        // Get the dimensions of the bitmap
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
-
-        // Determine how much to scale down the image
-        int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-
-        // Decode the image file into a Bitmap sized to fill the View
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inPurgeable = true;
-
-        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-        mImageView.setImageBitmap(bitmap);
     }
 
 

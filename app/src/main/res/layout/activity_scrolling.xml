@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".EditorActivity">
+    tools:context=".ScrollingActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
-            app:contentScrim="@color/colorPrimaryDark"
+            app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:toolbarId="@+id/toolbar">
 
@@ -33,14 +33,6 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <ImageView
-        android:id="@+id/image_attached"
-        android:layout_width="200px"
-        android:layout_height="88dp"
-        android:layout_margin="5dp"
-        android:visibility="invisible"
-        app:srcCompat="@drawable/image_holder" />
-
-    <include layout="@layout/content_editor" />
+    <include layout="@layout/x_scrolling_items" />
 
 </android.support.design.widget.CoordinatorLayout>

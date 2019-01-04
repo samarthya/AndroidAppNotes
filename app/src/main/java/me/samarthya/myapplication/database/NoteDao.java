@@ -9,6 +9,9 @@ import android.arch.persistence.room.Query;
 
 import java.util.List;
 
+/**
+ * Using room library to reuturn this from the abstract method.
+ */
 @Dao
 public interface NoteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)

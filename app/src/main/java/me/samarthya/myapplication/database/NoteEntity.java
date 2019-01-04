@@ -1,10 +1,14 @@
 package me.samarthya.myapplication.database;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.text.TextUtils;
 
 import java.util.Date;
+
+import io.reactivex.annotations.Nullable;
 
 /**
  * Class representing the model for the respective entry in the my notes list.
@@ -25,6 +29,14 @@ public class NoteEntity {
      */
     private String text;
 
+    @ColumnInfo(name = "attachment")
+    @Nullable
+    private boolean attachment;
+
+    @ColumnInfo(name = "image_url")
+    @Nullable
+    private String imgUrl;
+
     @Ignore
     public NoteEntity() {
     }
@@ -33,12 +45,24 @@ public class NoteEntity {
         this.id = id;
         this.date = date;
         this.text = text;
+        this.imgUrl = null;
+        this.attachment = false;
     }
 
     @Ignore
     public NoteEntity(Date date, String text) {
         this.date = date;
         this.text = text;
+        this.imgUrl = null;
+        this.attachment = false;
+    }
+
+    @Ignore
+    public NoteEntity(Date date, String text, String imgUrl) {
+        this.date = date;
+        this.text = text;
+        this.imgUrl = imgUrl;
+        this.attachment = (!TextUtils.isEmpty(imgUrl));
     }
 
     public int getId() {
@@ -71,6 +95,23 @@ public class NoteEntity {
                 "id=" + id +
                 ", date=" + date +
                 ", text='" + text + '\'' +
+                ", attachment='" + getImgUrl() + '\'' +
                 '}';
+    }
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
+    public boolean isAttachment() {
+        return attachment;
+    }
+
+    public void setAttachment(boolean attachment) {
+        this.attachment = attachment;
     }
 }

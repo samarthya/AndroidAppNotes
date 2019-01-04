@@ -5,6 +5,7 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.util.Date;
 import java.util.concurrent.Executor;
@@ -13,18 +14,16 @@ import java.util.concurrent.Executors;
 import me.samarthya.myapplication.database.AppRepository;
 import me.samarthya.myapplication.database.NoteEntity;
 
-/**
- * For editor activity.
- * One ViewModel for each activity.
- */
-public class EditorViewModel extends AndroidViewModel {
+import static me.samarthya.myapplication.utilities.Constants.TAG_SVM;
+
+public class ScrollingViewModel extends AndroidViewModel {
 
     public MutableLiveData<NoteEntity> mLiveNote = new MutableLiveData<>();
     private AppRepository mRepository;
 
     private Executor executor = Executors.newSingleThreadExecutor();
 
-    public EditorViewModel(@NonNull Application application) {
+    public ScrollingViewModel(@NonNull Application application) {
         super(application);
         mRepository = AppRepository.getInstance(getApplication());
     }
@@ -48,18 +47,25 @@ public class EditorViewModel extends AndroidViewModel {
                 return;
             }
             if (TextUtils.isEmpty(imageLocation)) {
-                note = new NoteEntity(new Date(), noteText.trim());
+                saveNote(noteText);
+                return;
             } else {
                 note = new NoteEntity(new Date(), noteText.trim(), imageLocation.trim());
             }
         } else {
             note.setText(noteText.trim());
+            if (!TextUtils.isEmpty(imageLocation) && (imageLocation.compareToIgnoreCase(imageLocation.trim()) == 0)) {
+                note.setImgUrl(imageLocation.trim());
+                note.setAttachment(true);
+            }
+
         }
 
         mRepository.insertNote(note);
     }
 
     public void saveNote(String noteText) {
+        Log.i(TAG_SVM, "saveNote: OnlyNote");
         NoteEntity note = mLiveNote.getValue();
 
         if (note == null) {
@@ -71,6 +77,8 @@ public class EditorViewModel extends AndroidViewModel {
             note.setText(noteText.trim());
         }
 
+        note.setImgUrl(null);
+        note.setAttachment(false);
         mRepository.insertNote(note);
     }
 

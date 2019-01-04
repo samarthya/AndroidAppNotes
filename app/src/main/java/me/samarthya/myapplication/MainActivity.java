@@ -34,9 +34,10 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.fab)
     void fabClickHandler() {
-        Intent intent = new Intent(this, EditorActivity.class);
+        Intent intent = new Intent(this, ScrollingActivity.class);
         startActivity(intent);
     }
+
 
     private List<NoteEntity> noteEntityList = new ArrayList<>();
     private NotesAdapter mAdapter;
@@ -135,9 +136,19 @@ public class MainActivity extends AppCompatActivity {
                 deleteAllNotes();
                 return true;
             }
+
+           /* case R.id.action_show_other_note: {
+                showNoteWithAttachment();
+                return true;
+            }*/
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showNoteWithAttachment() {
+        Intent intent = new Intent(this, ScrollingActivity.class);
+        startActivity(intent);
     }
 
 

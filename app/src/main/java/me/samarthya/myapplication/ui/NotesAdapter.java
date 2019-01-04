@@ -14,8 +14,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import me.samarthya.myapplication.EditorActivity;
 import me.samarthya.myapplication.R;
+import me.samarthya.myapplication.ScrollingActivity;
 import me.samarthya.myapplication.database.DateConverter;
 import me.samarthya.myapplication.database.NoteEntity;
 
@@ -48,7 +48,7 @@ public class NotesAdapter extends RecyclerView.Adapter< NotesAdapter.ViewHolder 
         viewHolder.mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(mContext, EditorActivity.class);
+                Intent intent = new Intent(mContext, ScrollingActivity.class);
                 intent.putExtra(NOTE_ID_KEY, note.getId());
                 mContext.startActivity(intent);
             }

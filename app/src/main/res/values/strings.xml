@@ -98,4 +98,8 @@
     <string name="action_delete">Delete</string>
     <string name="app_logo_description">My personal diary</string>
     <string name="action_attach">Attach</string>
+    <string name="title_activity_scrolling">ScrollingActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="scrolling_text">Enter note</string>
+    <string name="note_with_attachment">Note with attachment</string>
 </resources>

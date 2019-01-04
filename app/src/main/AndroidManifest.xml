@@ -4,10 +4,17 @@
 
     <uses-feature
         android:name="android.hardware.camera"
-        android:required="false" />
-
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+        android:required="true" />
+    <!--
+    On Android 4.3 and lower, writing to this directory also requires the
+    WRITE_EXTERNAL_STORAGE permission. Beginning with Android 4.4, the permission is no longer
+    required because the directory is not accessible by other apps, so you can declare the
+    permission should be requested only on the lower versions of Android by adding the
+    maxSdkVersion attribute
+    -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
 
     <application
         android:allowBackup="true"
@@ -33,6 +40,27 @@
         <activity
             android:name=".EditorActivity"
             android:label="@string/title_activity_editor"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="me.samarthya.myapplication.MainActivity" />
+        </activity>
+
+        <!-- FileProvider is a special subclass of ContentProvider -->
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="me.samarthya.myapplication.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <activity
+            android:name=".ScrollingActivity"
+            android:label="@string/title_activity_scrolling"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
