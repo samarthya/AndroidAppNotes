@@ -57,6 +57,9 @@ public class ScrollingViewModel extends AndroidViewModel {
             if (!TextUtils.isEmpty(imageLocation) && (imageLocation.compareToIgnoreCase(imageLocation.trim()) == 0)) {
                 note.setImgUrl(imageLocation.trim());
                 note.setAttachment(true);
+            } else {
+                note.setImgUrl(null);
+                note.setAttachment(false);
             }
 
         }

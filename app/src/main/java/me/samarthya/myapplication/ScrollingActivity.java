@@ -74,6 +74,7 @@ public class ScrollingActivity extends AppCompatActivity {
      * The image delete path.
      */
     void deleteAttachedImage() {
+
         /**
          * Delete the existing file if any and then clear out
          * the holders.
@@ -82,6 +83,7 @@ public class ScrollingActivity extends AppCompatActivity {
             File mFile = new File(mCurrentPhotoPath);
             if (mFile.exists()) {
                 Boolean bDeleted = mFile.delete();
+                Log.i(TAG_EDITOR_ACTIVITY, "deleteAttachedImage: " + bDeleted);
             }
             mCurrentPhotoPath = null;
         }
@@ -94,29 +96,36 @@ public class ScrollingActivity extends AppCompatActivity {
      * or from the URL.
      */
     private void setPic() {
-        // Get the dimensions of the View
-        int targetW = mImageView.getWidth();
-        int targetH = mImageView.getHeight();
+        if (mCurrentPhotoPath != null) {
+            // Get the dimensions of the View
+            int targetW = mImageView.getWidth();
+            int targetH = mImageView.getHeight();
 
-        // Get the dimensions of the bitmap
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+            // Get the dimensions of the bitmap
+            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+            bmOptions.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
 
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
+            int photoW = bmOptions.outWidth;
+            int photoH = bmOptions.outHeight;
 
-        // Determine how much to scale down the image
-        int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
+            // Determine how much to scale down the image
+            int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
 
-        // Decode the image file into a Bitmap sized to fill the View
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inPurgeable = true;
+            // Decode the image file into a Bitmap sized to fill the View
+            bmOptions.inJustDecodeBounds = false;
+            bmOptions.inSampleSize = scaleFactor;
+            bmOptions.inPurgeable = true;
 
-        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-        Log.i(TAG_EDITOR_ACTIVITY, "setPic: File at " + mCurrentPhotoPath + " is set.");
-        mImageView.setImageBitmap(bitmap);
+            Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+            Log.i(TAG_EDITOR_ACTIVITY, "setPic: File at " + mCurrentPhotoPath + " is set.");
+
+            mImageView.setImageBitmap(bitmap);
+        } else {
+            Log.i(TAG_EDITOR_ACTIVITY, "setPic: ImageHolder blank.");
+            mImageView.setImageResource(R.drawable.image_holder);
+        }
+
     }
 
     /**
@@ -125,20 +134,27 @@ public class ScrollingActivity extends AppCompatActivity {
     private void setImageInformation() {
         if (mCurrentPhotoPath != null) {
             mAddImageButton.setImageResource(R.drawable.ic_edit);
-            mImageView.setImageResource(R.drawable.image_holder);
             mDeleteImageButton.setClickable(true);
         } else {
-
             mAddImageButton.setImageResource(R.drawable.ic_add);
             mDeleteImageButton.setClickable(false);
         }
+
+        setPic();
     }
 
+    /**
+     * Create a temporary file with a unique name that we can use to save the image.
+     *
+     * @return
+     * @throws IOException
+     */
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
@@ -188,7 +204,6 @@ public class ScrollingActivity extends AppCompatActivity {
                         mCurrentPhotoPath = noteEntity.getImgUrl();
                         Log.i(TAG_EDITOR_ACTIVITY, "onChanged: URL = " + mCurrentPhotoPath);
                         setImageInformation();
-                        setPic();
                     }
                 }
 
@@ -261,10 +276,11 @@ public class ScrollingActivity extends AppCompatActivity {
      */
     void attachImage() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            File photoFile = null;
+        File photoFile = null;
 
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             try {
+
                 photoFile = createImageFile();
 
                 /** Continue only if the File was successfully created **/
@@ -273,6 +289,9 @@ public class ScrollingActivity extends AppCompatActivity {
                             "me.samarthya.myapplication.fileprovider",
                             photoFile);
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    /**
+                     * Go for the image activity.
+                     */
                     startActivityForResult(takePictureIntent, CAPTURE_PHOTO);
                 }
             } catch (IOException ex) {
@@ -301,8 +320,7 @@ public class ScrollingActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == CAPTURE_PHOTO && resultCode == RESULT_OK) {
             Log.i(TAG_EDITOR_ACTIVITY, "onActivityResult: @ " + mCurrentPhotoPath);
-            //galleryAddPic();
-            setPic();
+            setImageInformation();
         }
     }
 
