@@ -29,6 +29,10 @@ import me.samarthya.myapplication.viewmodel.MainViewModel;
  */
 public class MainActivity extends AppCompatActivity {
 
+    /**
+     * For application that needs a list or large data based or
+     * too many changes.
+     */
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
 

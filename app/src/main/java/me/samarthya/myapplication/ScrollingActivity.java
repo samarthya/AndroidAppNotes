@@ -98,8 +98,8 @@ public class ScrollingActivity extends AppCompatActivity {
     private void setPic() {
         if (mCurrentPhotoPath != null) {
             // Get the dimensions of the View
-            int targetW = mImageView.getWidth();
-            int targetH = mImageView.getHeight();
+            int targetW = mImageView.getWidth() > 0 ? mImageView.getWidth() : 150;
+            int targetH = mImageView.getHeight() > 0 ? mImageView.getHeight() : 150;
 
             // Get the dimensions of the bitmap
             BitmapFactory.Options bmOptions = new BitmapFactory.Options();
@@ -228,10 +228,14 @@ public class ScrollingActivity extends AppCompatActivity {
         if (!mNewNote) {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.menu_scrolling, menu);
-        } else {
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.menu_attach, menu);
         }
+        /**
+         * Don't need the attach menu for the new note now.
+         */
+//      else {
+//            MenuInflater inflater = getMenuInflater();
+//            inflater.inflate(R.menu.menu_attach, menu);
+//        }
         return super.onCreateOptionsMenu(menu);
     }
 
