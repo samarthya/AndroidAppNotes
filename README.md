@@ -5,3 +5,6 @@ image library.
 
 At the moment in version v1.0 will only allow you to store information in the SQLite db which will be further
 enhanced.
+
+
+![](AndroidAppNotes/screenshots/home_page.png)
