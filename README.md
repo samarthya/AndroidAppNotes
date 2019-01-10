@@ -1,3 +1,7 @@
-# AndroidAppNotes
-My first application that takes short notes on the android application. Learning from the Author to how to define
-and use ViewModels and Repostiory which uses SQLite and Room library.
+# MyDiary
+**_MyDiary_** android application that allows users to take textual notes and attach image to these notes. It
+uses SQLite to store the textual information and uses the local file sustem to store the private
+image library.
+
+At the moment in version v1.0 will only allow you to store information in the SQLite db which will be further
+enhanced.

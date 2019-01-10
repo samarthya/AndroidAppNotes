@@ -16,6 +16,9 @@ import me.samarthya.myapplication.database.NoteEntity;
 
 import static me.samarthya.myapplication.utilities.Constants.TAG_SVM;
 
+/**
+ * ViewModel for the scrolling view.
+ */
 public class ScrollingViewModel extends AndroidViewModel {
 
     public MutableLiveData<NoteEntity> mLiveNote = new MutableLiveData<>();
